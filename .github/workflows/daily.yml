@@ -1,0 +1,40 @@
+name: Günlük Enerji Raporu
+
+on:
+  schedule:
+    # Her gün saat 07:00 UTC (Türkiye 10:00)
+    - cron: '0 7 * * *'
+  workflow_dispatch:
+    # Manuel tetikleme — Actions sekmesinden "Run workflow" butonu
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Bağımlılıkları kur
+        run: pip install -r requirements.txt
+
+      - name: Rapor üret
+        run: python run.py
+
+      - name: docs/index.html'i commit et
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/index.html
+          git diff --staged --quiet || git commit -m "📊 Günlük rapor — $(date -u '+%d %b %Y %H:%M UTC')"
+          git push
