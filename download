@@ -1,0 +1,9 @@
+__pycache__/
+*.pyc
+*.csv
+*.json
+energy_rapor_*.html
+energy_dashboard_*.html
+energy_*.html
+!docs/index.html
+.env
